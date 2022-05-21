@@ -1,0 +1,24 @@
+{
+  "name": "express-mesto-gha",
+  "version": "1.0.0",
+  "description": "Проект Mesto фронтенд + бэкенд",
+  "main": "index.js",
+  "scripts": {
+    "lint": "npx eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VictoriaSultan/express-mesto-gha.git"
+  },
+  "author": "VictoriaSultan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VictoriaSultan/express-mesto-gha/issues"
+  },
+  "homepage": "https://github.com/VictoriaSultan/express-mesto-gha#readme",
+  "devDependencies": {
+    "eslint": "^8.16.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  }
+}
