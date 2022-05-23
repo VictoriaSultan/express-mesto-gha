@@ -45,6 +45,18 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'Внутренняя ошибка сервера'
+        : message,
+    });
+  next();
+});
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
