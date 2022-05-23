@@ -9,7 +9,7 @@ const users = require('./routes/users');
 
 const {
   PORT = 3000,
-  MONGODB = 'mongodb://localhost:27017/mestodb',
+    MONGODB = 'mongodb://localhost:27017/mestodb',
 } = process.env;
 
 const options = {
@@ -46,15 +46,23 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
+  const {
+    statusCode = 500, message,
+  } = err;
   res
     .status(statusCode)
     .send({
-      message: statusCode === 500
-        ? 'Внутренняя ошибка сервера'
-        : message,
+      message: statusCode === 500 ? 'Внутренняя ошибка сервера' : message,
     });
   next();
+});
+
+app.get('*', (req, res) => {
+  res
+    .status(404)
+    .send({
+      message: 'Запрашиваемая страница не найдена',
+    });
 });
 
 app.listen(PORT, () => {
