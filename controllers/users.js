@@ -38,7 +38,7 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((error) => {
       console.log('createUser', error.name);
-      if (error.name === 'CastError') {
+      if (error.name === 'ValidationError') {
         next({
           statusCode: 400,
           message: 'Переданы некорректные данные при создании пользователя',
@@ -71,7 +71,7 @@ module.exports.updateUserProfile = (req, res, next) => {
           statusCode: 404,
           message: 'Пользователь с указанным _id не найден',
         });
-      } else if (error.name === 'CastError2') {
+      } else if (error.name === 'ValidationError') {
         next({
           statusCode: 400,
           message: 'Переданы некорректные данные при обновлении профиля',
@@ -101,7 +101,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
           statusCode: 404,
           message: 'Пользователь с указанным _id не найден',
         });
-      } else if (error.name === 'CastError2') {
+      } else if (error.name === 'ValidationError') {
         next({
           statusCode: 400,
           message: 'Переданы некорректные данные при обновлении аватара',
