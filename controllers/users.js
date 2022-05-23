@@ -15,10 +15,15 @@ module.exports.getUser = (req, res, next) => {
     })
     .catch((error) => {
       console.log('getUser', error.name);
-      if (error.name === 'CastError') {
+      if (error.name === 'NotFound') {
         next({
           statusCode: 404,
           message: 'Пользователь по указанному _id не найден',
+        });
+      } else if (error.name === 'CastError') {
+        next({
+          statusCode: 400,
+          message: 'Передано некорректное значение параметра _id',
         });
       } else {
         next(error);
