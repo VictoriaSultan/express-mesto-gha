@@ -13,7 +13,17 @@ module.exports.getUser = (req, res, next) => {
     .then((data) => {
       res.send(data);
     })
-    .catch(next);
+    .catch((error) => {
+      console.log('getUser', error.name);
+      if (error.name === 'CastError') {
+        next({
+          statusCode: 404,
+          message: 'Пользователь по указанному _id не найден',
+        });
+      } else {
+        next(error);
+      }
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -26,7 +36,17 @@ module.exports.createUser = (req, res, next) => {
     .then((data) => {
       res.send(data);
     })
-    .catch(next);
+    .catch((error) => {
+      console.log('createUser', error.name);
+      if (error.name === 'CastError') {
+        next({
+          statusCode: 400,
+          message: 'Переданы некорректные данные при создании пользователя',
+        });
+      } else {
+        next(error);
+      }
+    });
 };
 
 module.exports.updateUserProfile = (req, res, next) => {
@@ -44,7 +64,22 @@ module.exports.updateUserProfile = (req, res, next) => {
     .then((data) => {
       res.send(data);
     })
-    .catch(next);
+    .catch((error) => {
+      console.log('updateUserProfile', error.name);
+      if (error.name === 'CastError') {
+        next({
+          statusCode: 404,
+          message: 'Пользователь с указанным _id не найден',
+        });
+      } else if (error.name === 'CastError2') {
+        next({
+          statusCode: 400,
+          message: 'Переданы некорректные данные при обновлении профиля',
+        });
+      } else {
+        next(error);
+      }
+    });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
@@ -59,5 +94,20 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .then((data) => {
       res.send(data);
     })
-    .catch(next);
+    .catch((error) => {
+      console.log('updateUserAvatar', error.name);
+      if (error.name === 'CastError') {
+        next({
+          statusCode: 404,
+          message: 'Пользователь с указанным _id не найден',
+        });
+      } else if (error.name === 'CastError2') {
+        next({
+          statusCode: 400,
+          message: 'Переданы некорректные данные при обновлении аватара',
+        });
+      } else {
+        next(error);
+      }
+    });
 };

@@ -7,6 +7,10 @@ const bodyParser = require('body-parser');
 const cards = require('./routes/cards');
 const users = require('./routes/users');
 
+// const ERROR_WRONG_DATA_STATUS_CODE = 400;
+const ERROR_NOT_FOUND_STATUS_CODE = 404;
+const ERROR_INTERNAL_STATUS_CODE = 500;
+
 const {
   PORT = 3000,
   MONGODB = 'mongodb://localhost:27017/mestodb',
@@ -45,24 +49,25 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((err, req, res, next) => {
-  const {
-    statusCode = 500, message,
-  } = err;
+app.use('*', (req, res) => {
   res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500 ? 'Внутренняя ошибка сервера' : message,
-    });
-  next();
-});
-
-app.get('*', (req, res) => {
-  res
-    .status(404)
+    .status(ERROR_NOT_FOUND_STATUS_CODE)
     .send({
       message: 'Запрашиваемая страница не найдена',
     });
+});
+
+app.use((err, req, res, next) => {
+  const {
+    statusCode = ERROR_INTERNAL_STATUS_CODE, message,
+  } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === ERROR_INTERNAL_STATUS_CODE ? 'На сервере произошла ошибка' : message,
+    });
+  next();
 });
 
 app.listen(PORT, () => {
