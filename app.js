@@ -38,9 +38,6 @@ app.use(bodyParser.urlencoded({
   extended: true,
 }));
 
-app.use('/', cards);
-app.use('/', users);
-
 app.use((req, res, next) => {
   req.user = {
     _id: '628a929948fa41ba37387c4e',
@@ -48,6 +45,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.use('/', cards);
+app.use('/', users);
 
 app.use('*', (req, res) => {
   res
@@ -61,6 +61,8 @@ app.use((err, req, res, next) => {
   const {
     statusCode = ERROR_INTERNAL_STATUS_CODE, message,
   } = err;
+
+  console.log('errorHandler', err);
 
   res
     .status(statusCode)
