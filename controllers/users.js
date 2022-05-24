@@ -39,41 +39,38 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
-  User.create({
+  const {
     name,
     about,
     avatar,
-  })
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((error) => {
-      console.log('createUser', error.name);
-      if (error.name === 'ValidationError') {
-        next({
-          statusCode: 400,
-          message: 'Переданы некорректные данные при создании пользователя',
-        });
-      } else {
-        next(error);
-      }
+  } = req.body;
+  if (typeof avatar === 'undefined') {
+    next({
+      statusCode: 400,
+      message: 'Переданы некорректные данные при создании пользователя',
     });
+  } else {
+    User.create({ name, about, avatar })
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((error) => {
+        console.log('createUser', error.name);
+        if (error.name === 'ValidationError') {
+          next({
+            statusCode: 400,
+            message: 'Переданы некорректные данные при создании пользователя',
+          });
+        } else {
+          next(error);
+        }
+      });
+  }
 };
 
 module.exports.updateUserProfile = (req, res, next) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    {
-      name,
-      about,
-    },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((data) => {
       res.send(data);
     })
@@ -97,13 +94,7 @@ module.exports.updateUserProfile = (req, res, next) => {
 
 module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { avatar },
-    {
-      new: true,
-    },
-  )
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
     .then((data) => {
       res.send(data);
     })

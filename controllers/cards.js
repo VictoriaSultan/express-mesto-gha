@@ -37,7 +37,14 @@ module.exports.deleteCard = (req, res, next) => {
     owner: req.user._id,
   })
     .then((data) => {
-      res.send(data);
+      if (data) {
+        res.send(data);
+      } else {
+        next({
+          statusCode: 404,
+          message: 'Карточка с указанным _id не найдена',
+        });
+      }
     })
     .catch((error) => {
       console.log('deleteCard', error.name);
@@ -64,7 +71,14 @@ module.exports.likeCard = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .then((data) => {
-      res.send(data);
+      if (data) {
+        res.send(data);
+      } else {
+        next({
+          statusCode: 404,
+          message: 'Передан несуществующий _id карточки',
+        });
+      }
     })
     .catch((error) => {
       console.log('likeCard', error.name);
@@ -91,7 +105,14 @@ module.exports.dislikeCard = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .then((data) => {
-      res.send(data);
+      if (data) {
+        res.send(data);
+      } else {
+        next({
+          statusCode: 404,
+          message: 'Передан несуществующий _id карточки',
+        });
+      }
     })
     .catch((error) => {
       console.log('dislikeCard', error.name);
