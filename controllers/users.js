@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const { ERROR_WRONG_DATA_STATUS_CODE, ERROR_NOT_FOUND_STATUS_CODE } = require('../utils/constants');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -13,7 +14,7 @@ module.exports.getUser = (req, res, next) => {
     .then((data) => {
       if (!data) {
         res
-          .status(404)
+          .status(ERROR_NOT_FOUND_STATUS_CODE)
           .send({
             message: 'Пользователь по указанному _id не найден',
           });
@@ -21,15 +22,14 @@ module.exports.getUser = (req, res, next) => {
       res.send(data);
     })
     .catch((error) => {
-      console.log('getUser', error.name);
       if (error.name === 'NotFound') {
         next({
-          statusCode: 404,
+          statusCode: ERROR_NOT_FOUND_STATUS_CODE,
           message: 'Пользователь по указанному _id не найден',
         });
       } else if (error.name === 'CastError') {
         next({
-          statusCode: 400,
+          statusCode: ERROR_WRONG_DATA_STATUS_CODE,
           message: 'Передано некорректное значение параметра _id',
         });
       } else {
@@ -46,7 +46,7 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
   if (typeof avatar === 'undefined') {
     next({
-      statusCode: 400,
+      statusCode: ERROR_WRONG_DATA_STATUS_CODE,
       message: 'Переданы некорректные данные при создании пользователя',
     });
   } else {
@@ -55,10 +55,9 @@ module.exports.createUser = (req, res, next) => {
         res.send(data);
       })
       .catch((error) => {
-        console.log('createUser', error.name);
         if (error.name === 'ValidationError') {
           next({
-            statusCode: 400,
+            statusCode: ERROR_WRONG_DATA_STATUS_CODE,
             message: 'Переданы некорректные данные при создании пользователя',
           });
         } else {
@@ -75,15 +74,14 @@ module.exports.updateUserProfile = (req, res, next) => {
       res.send(data);
     })
     .catch((error) => {
-      console.log('updateUserProfile', error.name);
       if (error.name === 'CastError') {
         next({
-          statusCode: 404,
+          statusCode: ERROR_NOT_FOUND_STATUS_CODE,
           message: 'Пользователь с указанным _id не найден',
         });
       } else if (error.name === 'ValidationError') {
         next({
-          statusCode: 400,
+          statusCode: ERROR_WRONG_DATA_STATUS_CODE,
           message: 'Переданы некорректные данные при обновлении профиля',
         });
       } else {
@@ -99,15 +97,14 @@ module.exports.updateUserAvatar = (req, res, next) => {
       res.send(data);
     })
     .catch((error) => {
-      console.log('updateUserAvatar', error.name);
       if (error.name === 'CastError') {
         next({
-          statusCode: 404,
+          statusCode: ERROR_NOT_FOUND_STATUS_CODE,
           message: 'Пользователь с указанным _id не найден',
         });
       } else if (error.name === 'ValidationError') {
         next({
-          statusCode: 400,
+          statusCode: ERROR_WRONG_DATA_STATUS_CODE,
           message: 'Переданы некорректные данные при обновлении аватара',
         });
       } else {

@@ -4,12 +4,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
+const { ERROR_NOT_FOUND_STATUS_CODE, ERROR_INTERNAL_STATUS_CODE } = require('./utils/constants');
 const cards = require('./routes/cards');
 const users = require('./routes/users');
-
-// const ERROR_WRONG_DATA_STATUS_CODE = 400;
-const ERROR_NOT_FOUND_STATUS_CODE = 404;
-const ERROR_INTERNAL_STATUS_CODE = 500;
 
 const {
   PORT = 3000,
@@ -61,8 +58,6 @@ app.use((err, req, res, next) => {
   const {
     statusCode = ERROR_INTERNAL_STATUS_CODE, message,
   } = err;
-
-  console.log('errorHandler', err);
 
   res
     .status(statusCode)

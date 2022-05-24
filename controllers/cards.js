@@ -1,4 +1,5 @@
 const Card = require('../models/card');
+const { ERROR_WRONG_DATA_STATUS_CODE, ERROR_NOT_FOUND_STATUS_CODE } = require('../utils/constants');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -19,10 +20,9 @@ module.exports.createCard = (req, res, next) => {
       res.send(data);
     })
     .catch((error) => {
-      console.log('createCard', error.name);
       if (error.name === 'ValidationError') {
         next({
-          statusCode: 400,
+          statusCode: ERROR_WRONG_DATA_STATUS_CODE,
           message: 'Переданы некорректные данные при создании карточки',
         });
       } else {
@@ -41,21 +41,20 @@ module.exports.deleteCard = (req, res, next) => {
         res.send(data);
       } else {
         next({
-          statusCode: 404,
+          statusCode: ERROR_NOT_FOUND_STATUS_CODE,
           message: 'Карточка с указанным _id не найдена',
         });
       }
     })
     .catch((error) => {
-      console.log('deleteCard', error.name);
       if (error.name === 'ValidationError') {
         next({
-          statusCode: 404,
+          statusCode: ERROR_NOT_FOUND_STATUS_CODE,
           message: 'Карточка с указанным _id не найдена',
         });
       } else if (error.name === 'CastError') {
         next({
-          statusCode: 400,
+          statusCode: ERROR_WRONG_DATA_STATUS_CODE,
           message: 'Переданы некорректные данные при создании карточки',
         });
       } else {
@@ -75,21 +74,20 @@ module.exports.likeCard = (req, res, next) => {
         res.send(data);
       } else {
         next({
-          statusCode: 404,
+          statusCode: ERROR_NOT_FOUND_STATUS_CODE,
           message: 'Передан несуществующий _id карточки',
         });
       }
     })
     .catch((error) => {
-      console.log('likeCard', error.name);
       if (error.name === 'ValidationError') {
         next({
-          statusCode: 404,
+          statusCode: ERROR_NOT_FOUND_STATUS_CODE,
           message: 'Передан несуществующий _id карточки',
         });
       } else if (error.name === 'CastError') {
         next({
-          statusCode: 400,
+          statusCode: ERROR_WRONG_DATA_STATUS_CODE,
           message: 'Переданы некорректные данные для постановки/снятии лайка',
         });
       } else {
@@ -109,21 +107,20 @@ module.exports.dislikeCard = (req, res, next) => {
         res.send(data);
       } else {
         next({
-          statusCode: 404,
+          statusCode: ERROR_NOT_FOUND_STATUS_CODE,
           message: 'Передан несуществующий _id карточки',
         });
       }
     })
     .catch((error) => {
-      console.log('dislikeCard', error.name);
       if (error.name === 'ValidationError') {
         next({
-          statusCode: 404,
+          statusCode: ERROR_NOT_FOUND_STATUS_CODE,
           message: 'Передан несуществующий _id карточки',
         });
       } else if (error.name === 'CastError') {
         next({
-          statusCode: 400,
+          statusCode: ERROR_WRONG_DATA_STATUS_CODE,
           message: 'Переданы некорректные данные для постановки/снятии лайка',
         });
       } else {
