@@ -41,10 +41,15 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .catch((error) => {
       console.log('deleteCard', error.name);
-      if (error.name === 'CastError') {
+      if (error.name === 'ValidationError') {
         next({
           statusCode: 404,
           message: 'Карточка с указанным _id не найдена',
+        });
+      } else if (error.name === 'CastError') {
+        next({
+          statusCode: 400,
+          message: 'Переданы некорректные данные при создании карточки',
         });
       } else {
         next(error);
@@ -63,12 +68,12 @@ module.exports.likeCard = (req, res, next) => {
     })
     .catch((error) => {
       console.log('likeCard', error.name);
-      if (error.name === 'CastError') {
+      if (error.name === 'ValidationError') {
         next({
           statusCode: 404,
           message: 'Передан несуществующий _id карточки',
         });
-      } else if (error.name === 'ValidationError') {
+      } else if (error.name === 'CastError') {
         next({
           statusCode: 400,
           message: 'Переданы некорректные данные для постановки/снятии лайка',
@@ -90,12 +95,12 @@ module.exports.dislikeCard = (req, res, next) => {
     })
     .catch((error) => {
       console.log('dislikeCard', error.name);
-      if (error.name === 'CastError') {
+      if (error.name === 'ValidationError') {
         next({
           statusCode: 404,
           message: 'Передан несуществующий _id карточки',
         });
-      } else if (error.name === 'ValidationError') {
+      } else if (error.name === 'CastError') {
         next({
           statusCode: 400,
           message: 'Переданы некорректные данные для постановки/снятии лайка',
