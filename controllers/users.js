@@ -71,6 +71,7 @@ module.exports.updateUserProfile = (req, res, next) => {
     },
     {
       new: true,
+      runValidators: true,
     },
   )
     .then((data) => {
