@@ -1,5 +1,45 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { ERROR_WRONG_DATA_STATUS_CODE, ERROR_NOT_FOUND_STATUS_CODE } = require('../utils/constants');
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).send({ message: 'Email и пароль не могут быть пустыми' });
+  }
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'wakanda-forever', { expiresIn: '7d' });
+      res
+        .cookie('jwt', token, {
+          httpOnly: true,
+        })
+        .send({ token });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
+
+module.exports.getCurrentUser = (req, res) => {
+  User.findById(req.user._id)
+    .orFail(new Error('NotFound'))
+    .then((user) => res.status(200).send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Ошибка при запросе.' });
+      } else if (err.message === 'NotFound') {
+        res
+          .status(404)
+          .send({ message: 'Пользователь по указанному _id не найден.' });
+      } else {
+        res.status(500).send({ message: 'Ошибка сервера.' });
+      }
+    });
+};
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -43,14 +83,23 @@ module.exports.createUser = (req, res, next) => {
     name,
     about,
     avatar,
+    email,
+    password,
   } = req.body;
-  if (typeof avatar === 'undefined') {
+  if (typeof avatar === 'undefined' || !validator.isEmail(email)) {
     next({
       statusCode: ERROR_WRONG_DATA_STATUS_CODE,
       message: 'Переданы некорректные данные при создании пользователя',
     });
   } else {
-    User.create({ name, about, avatar })
+    bcrypt.hash(password, 10)
+      .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
       .then((data) => {
         res.send(data);
       })
