@@ -8,6 +8,9 @@ const { ERROR_NOT_FOUND_STATUS_CODE, ERROR_INTERNAL_STATUS_CODE } = require('./u
 const cards = require('./routes/cards');
 const users = require('./routes/users');
 
+const auth = require('./middlewares/auth');
+const { createUser, login } = require('./controllers/users');
+
 const {
   PORT = 3000,
   MONGODB = 'mongodb://localhost:27017/mestodb',
@@ -19,8 +22,8 @@ const options = {
 
 mongoose
   .connect(MONGODB, options)
-  .catch((err) => {
-    console.log(err);
+  .catch((error) => {
+    console.error(error);
     process.exit(1);
   });
 
@@ -35,13 +38,10 @@ app.use(bodyParser.urlencoded({
   extended: true,
 }));
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '628a929948fa41ba37387c4e',
-  };
+app.post('/signin', login);
+app.post('/signup', createUser);
 
-  next();
-});
+app.use(auth);
 
 app.use('/', cards);
 app.use('/', users);
