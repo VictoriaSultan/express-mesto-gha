@@ -49,10 +49,10 @@ module.exports.getCurrentUser = (req, res, next) => {
     });
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch(() => res.status(500).send({ message: 'Ошибка сервера.' }));
+    .catch(next);
 };
 
 module.exports.getUserById = (req, res, next) => {

@@ -5,10 +5,10 @@ const {
 } = require('../utils/errors');
 const Card = require('../models/card');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch(() => res.status(500).send({ message: 'Ошибка сервера.' }));
+    .catch(next);
 };
 
 module.exports.createCard = (req, res, next) => {
@@ -39,7 +39,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (req.user._id !== card.owner.toString()) {
         next(new ForbiddenError('Чужую карточку нельзя удалить.'));
       } else {
-        Card.deleteOne(card).then(() => { res.status(200).send({ message: `Карточка с id ${card.id} успешно удалена!` }); });
+        return Card.deleteOne(card).then(() => { res.status(200).send({ message: `Карточка с id ${card.id} успешно удалена!` }); });
       }
     })
     .catch((err) => {
