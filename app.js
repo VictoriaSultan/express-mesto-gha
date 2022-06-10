@@ -1,72 +1,61 @@
 require('dotenv').config();
 
 const express = require('express');
+const helmet = require('helmet');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-
-const { ERROR_NOT_FOUND_STATUS_CODE, ERROR_INTERNAL_STATUS_CODE } = require('./utils/constants');
+const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 const cards = require('./routes/cards');
 const users = require('./routes/users');
+const auth = require('./middlewares/auth');
+const { createUser, login } = require('./controllers/users');
+const { errorHandler } = require('./middlewares/errorHandler');
+const { validateSignUp, validateSignIn } = require('./middlewares/validators');
+const { NotFoundError } = require('./utils/errors');
 
-const {
-  PORT = 3000,
-  MONGODB = 'mongodb://localhost:27017/mestodb',
-} = process.env;
+const { PORT = 3000, MONGODB = 'mongodb://localhost:27017/mestodb' } = process.env;
 
 const options = {
   useNewUrlParser: true,
+  useUnifiedTopology: true,
+  // useCreateIndex: true,
+  // useFindAndModify: false,
 };
 
-mongoose
-  .connect(MONGODB, options)
-  .catch((err) => {
-    console.log(err);
-    process.exit(1);
-  });
+mongoose.connect(MONGODB, options).catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
 
 mongoose.connection.on('error', (error) => {
   console.error(error);
 });
 
 const app = express();
+app.use(helmet());
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  }),
+);
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true,
-}));
+app.use(cookieParser());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '628a929948fa41ba37387c4e',
-  };
+app.post('/signup', validateSignUp, createUser);
+app.post('/signin', validateSignIn, login);
 
-  next();
+app.use(auth);
+
+app.use('/users', users);
+app.use('/cards', cards);
+
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден.'));
 });
 
-app.use('/', cards);
-app.use('/', users);
-
-app.use('*', (req, res) => {
-  res
-    .status(ERROR_NOT_FOUND_STATUS_CODE)
-    .send({
-      message: 'Запрашиваемая страница не найдена',
-    });
-});
-
-app.use((err, req, res, next) => {
-  const {
-    statusCode = ERROR_INTERNAL_STATUS_CODE, message,
-  } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === ERROR_INTERNAL_STATUS_CODE ? 'На сервере произошла ошибка' : message,
-    });
-  next();
-});
-
+app.use(errors());
+app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
